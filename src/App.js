@@ -1,30 +1,37 @@
-import React, { useContext } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
-import { createContext,userContext } from "react";
+import axios from "axios";
 
-const myContext = createContext ();
 function App() {
-  const data ={
-    name : "siddu" ,
-    age :21 ,
-    gender :"male"
-  }
+  const [post, setPost] = useState([]); // ✅ inside component
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "https://jsonplaceholder.typicode.com/posts"
+        );
+        setPost(response.data); // ✅ set state
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData(); // ✅ call the async function
+  }, []);
+
   return (
-    <myContext.Provider value = {data}>
-      <UserData/>
-    </myContext.Provider>
+    <div className="App">
+      <h1>📌 Posts</h1>
+      <ul>
+        {post.slice(0, 5).map((p) => (
+          <li key={p.id}>
+            <strong>{p.title}</strong>
+            <p>{p.body}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
-
-const UserData=()=>{
-  const {name , age , gender} = useContext(myContext)
-  return ( <div>personal info is
-    <h1>name : {name}</h1>
-    <h1>age :{age}</h1>
-    <h1>gender:{gender}</h1>
-  </div>)
-}
-
-
 
 export default App;
