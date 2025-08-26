@@ -1,35 +1,31 @@
-import React, { useEffect, useState } from "react";
+import react from "react";
 import "./App.css";
-import axios from "axios";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Home } from "./pages/Home";
+import { Menu } from "./pages/Menu";
+import { Contact } from "./pages/Contact";
+import { Navbar } from "./Navbar";
+import {QueryClient , QueryClientProvider} from "@tanstack/react-query";
 
 function App() {
-  const [post, setPost] = useState([]); // ✅ inside component
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "https://jsonplaceholder.typicode.com/posts"
-        );
-        setPost(response.data); // ✅ set state
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData(); // ✅ call the async function
-  }, []);
-
+  const client = new QueryClient({defaultOptions:{
+    queries :{
+      refetchOnWindowFocus: true,
+    }
+  }}); 
   return (
     <div className="App">
-      <h1>📌 Posts</h1>
-      <ul>
-        {post.slice(0, 5).map((p) => (
-          <li key={p.id}>
-            <strong>{p.title}</strong>
-            <p>{p.body}</p>
-          </li>
-        ))}
-      </ul>
+      <QueryClientProvider client={client}>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<h1> PAGE NOT FOUND</h1>} />
+        </Routes>
+      </Router>
+      </QueryClientProvider>
     </div>
   );
 }
